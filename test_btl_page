@@ -1,0 +1,95 @@
+import pytest
+from pages.btl_page import BtlPage
+from pages.home_page import HomePage
+from selenium import webdriver
+import time
+import tests.test_home_page as test_home_page
+import psycopg2
+import utils.excel_utils as ExcelUtils
+import os
+#pytest.fixture
+def browser():
+    driver = webdriver.Chrome()
+    yield driver.quit()
+
+@pytest.mark.TC0004
+@pytest.mark.validateBTL
+def test_btl_page(browser,request):
+    data = ExcelUtils.get_data('TC0004')
+    if data:
+        # Accessing the 'Description' value
+        description = data.get('Test Case Description')
+        print(f"Test Case Description: {description}")
+    else:
+        print("No data found for the specified ID.")
+    request.node.driver = browser
+    home_page = HomePage(browser)
+    browser.get(data.get('URL'))
+    home_page.click_login_btn()
+    time.sleep(10)
+    print("this is the test case 0004")
+    btl_page = BtlPage(browser)
+    btl_page.click_finance()
+    # btl_page.click_payment_services()
+    btl_page.click_btl_page()
+    time.sleep(5)
+    assert btl_page.verify_filter_btn().is_displayed()
+    assert btl_page.verify_clear_filter_btn().is_displayed()
+    # assert btl_page.verify_update_local_bank_transfer_details().is_displayed()
+    assert btl_page.verify_import_date().is_displayed()
+    assert btl_page.verify_id_er_member().is_displayed()
+    assert btl_page.verify_mpf_account_no().is_displayed()
+    assert btl_page.verify_payment_method().is_displayed()
+    assert btl_page.verify_app_ref_no().is_displayed()
+    assert btl_page.verify_end_to_end_id().is_displayed()
+    assert btl_page.verify_payment_out_ref_no().is_displayed()
+    assert btl_page.verify_expected_payment_issue_date().is_displayed()
+    assert btl_page.verify_bank_cd().is_displayed()
+    assert btl_page.verify_bank_acc_no().is_displayed()
+    assert btl_page.verify_payee().is_displayed()
+    assert btl_page.verify_payment().is_displayed()
+    assert btl_page.verify_status().is_displayed()
+    assert btl_page.verify_reissuance().is_displayed()
+    assert btl_page.verify_target_currency().is_displayed()
+    assert btl_page.verify_action().is_displayed()
+    screenshot_path = os.path.join(os.getcwd()+"\screenshots", "TC0004.png")
+    request.node.driver.save_screenshot(screenshot_path)
+    request.node.add_report_section(
+        'test',
+        'Screenshot',
+        f'<img src="{screenshot_path}">')
+
+@pytest.mark.TC0005
+@pytest.mark.fetchDBValidateBTL
+def test_fetch_db_validate_btl(browser,request):
+    data = ExcelUtils.get_data('TC0005')
+    if data:
+        # Accessing the 'Description' value
+        description = data.get('Test Case Description')
+        print(f"Test Case Description: {description}")
+    else:
+        print("No data found for the specified ID.")
+    request.node.driver = browser
+    home_page = HomePage(browser)
+    check_record = 0
+    browser.get(data.get('URL'))
+    home_page.click_login_btn()
+    time.sleep(10)
+    print("this is the test case 0005")
+    btl_page = BtlPage(browser)
+    btl_page.click_payment_services()
+    btl_page.click_btl_page()
+    time.sleep(5)
+    connection = psycopg2.connect(database=data.get('Database'),user=data.get('User'),password=data.get('Password'),host=data.get('Host'),port=int(data.get('Port')))
+    cursor = connection.cursor()
+    cursor.execute(data.get('SQL'))
+    # Fetch all rows from database
+    record = cursor.fetchall()
+    assert btl_page.verify_payment_out_ref() in record[check_record]
+    print("data match for BTL Page")
+    screenshot_path = os.path.join(os.getcwd()+"\screenshots", "TC0005.png")
+    request.node.driver.save_screenshot(screenshot_path)
+    request.node.add_report_section(
+        'test',
+        'Screenshot',
+        f'<img src="{screenshot_path}">')
