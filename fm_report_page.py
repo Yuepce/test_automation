@@ -14,8 +14,8 @@ class FMReportPage(BasePage):
             "disabled_export_btn":(By.XPATH,"//span[@class='sl-icon sl-icon-download sl-icon_non-interactive']/parent::*/parent::button[text()='Export']"),
             "today_btn":(By.XPATH,"//div[contains(@class,'react-datepicker__today-button')]"),
             "export_btn":(By.XPATH,"//button[text()='Export']"),
-            "three_months_error_one":(By.XPATH,"//p[text()='Only 3 months is allowed'][1]"),
-            "three_months_error_two":(By.XPATH,"//p[text()='Only 3 months is allowed'][2]"),
+            "three_months_error_one":(By.XPATH,"//div[@class='notification-component']"),
+            # "three_months_error_two":(By.XPATH,"//p[text()='Only 3 months is allowed'][2]"),
             "successful_pop_up":(By.XPATH,"//h2[text()='Fund Movement File generation is Completed. File is  exported to Downloads folder.']")
             }
     
@@ -55,7 +55,7 @@ class FMReportPage(BasePage):
 
     def verify_three_months_error_one(self):
         three_months_error_one = self.find_element(*self.locators["three_months_error_one"])
-        return three_months_error_one
+        return three_months_error_one.text
     
     def verify_three_months_error_two(self):
         three_months_error_two = self.find_element(*self.locators["three_months_error_two"])
