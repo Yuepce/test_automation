@@ -80,6 +80,7 @@ def test_fetch_db_validate_btl(browser,request):
     print("this is the test case 0005")
     btl_page = BtlPage(browser)
     # btl_page.click_payment_services()
+    btl_page.click_finance() # April added
     btl_page.click_btl_page()
     time.sleep(5)
     connection = psycopg2.connect(database=data.get('Database'),user=data.get('User'),password=data.get('Password'),host=data.get('Host'),port=int(data.get('Port')))
