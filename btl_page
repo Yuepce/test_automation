@@ -29,9 +29,9 @@ class BtlPage(BasePage):
             "reissuance":(By.XPATH,"//*[text()='Reissuance Indicator']"),
             "target_currency":(By.XPATH,"//*[text()='Target Currency']"),
             "action":(By.XPATH,"//*[text()='Actions']"),
-            "payment_out_ref":(By.XPATH,"//tr[@class='MuiTableRow-root css-1gqug66'][1]/th[@class='MuiTableCell-root MuiTableCell-body MuiTableCell-alignRight MuiTableCell-sizeSmall css-507wcy'][7]")
+            "payment_out_ref":(By.XPATH,"//tbody/tr[1]/td[7]") # April changed it 
             }
-    
+
     def click_btl_page(self):
         self.find_element(*self.locators['btl_page']).click()
 
