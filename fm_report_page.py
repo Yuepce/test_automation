@@ -10,9 +10,11 @@ class FMReportPage(BasePage):
             "fund_movement_report_page_selector":(By.XPATH,"//span[contains(text(),'Fund Movement Report')]"),
             "fund_movement_report":(By.XPATH,"///h3[normalize-space()='Fund Movement Report']"),
             "from_date_picker":(By.XPATH,"//button[@aria-controls='relStartDate']"),
+            "date_picker_day_to_month_to_year":(By.XPATH,"//span[@class='sl-icon sl-icon-caret-down sl-icon_non-interactive']"),
             "to_date_picker":(By.XPATH,"//button[@aria-controls='relEndDate']//span[@class='sl-icon sl-icon-calendar sl-icon_non-interactive']"),
             "disabled_export_btn":(By.XPATH,"//span[@class='sl-icon sl-icon-download sl-icon_non-interactive']/parent::*/parent::button[text()='Export']"),
-            "today_btn":(By.XPATH,"//div[contains(@class,'react-datepicker__today-button')]"),
+            "reset_btn":(By.XPATH, "//button[normalize-space()='Reset']"),
+            "today_btn":(By.XPATH,"//td[@class='current-month-cell current-day']"),
             "export_btn":(By.XPATH,"//button[text()='Export']"),
             "three_months_error_one":(By.XPATH,"//div[@class='notification-component']"),
             # "three_months_error_two":(By.XPATH,"//p[text()='Only 3 months is allowed'][2]"),
@@ -25,6 +27,9 @@ class FMReportPage(BasePage):
 
     def click_finance(self):
         self.find_element(*self.locators['finance_tab']).click()
+
+    def click_date_picker_day_to_month_to_year(self):
+        self.find_element(*self.locators['date_picker_day_to_month_to_year']).click()
         
     # def click_fund_services(self):
     #     self.find_element(*self.locators['fund_services_tab']).click()
@@ -37,6 +42,10 @@ class FMReportPage(BasePage):
         to_date_picker = self.find_element(*self.locators["to_date_picker"])
         return to_date_picker
     
+    def verify_reset_btn(self):
+        reset_btn = self.find_element(*self.locators["reset_btn"])
+        return reset_btn
+
     def verify_disabled_export_btn(self):
         disabled_export_btn = self.find_element(*self.locators["disabled_export_btn"])
         return disabled_export_btn
@@ -57,9 +66,9 @@ class FMReportPage(BasePage):
         three_months_error_one = self.find_element(*self.locators["three_months_error_one"])
         return three_months_error_one.text
     
-    def verify_three_months_error_two(self):
-        three_months_error_two = self.find_element(*self.locators["three_months_error_two"])
-        return three_months_error_two
+    # def verify_three_months_error_two(self):
+    #     three_months_error_two = self.find_element(*self.locators["three_months_error_two"])
+    #     return three_months_error_two
     
     def verify_successful_pop_up(self):
         successful_pop_up = self.find_element(*self.locators["successful_pop_up"])
