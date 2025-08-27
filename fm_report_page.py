@@ -1,6 +1,12 @@
 from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
 from selenium import webdriver
+
+# April added:
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+
 class FMReportPage(BasePage):
     def __init__(self,driver):
         super().__init__(driver)
@@ -9,16 +15,18 @@ class FMReportPage(BasePage):
             "finance_tab": (By.XPATH, "//button[@id='sl-mega-menu-toggle-Finance']//span[contains(text(),'Finance')]"),
             "fund_movement_report_page_selector":(By.XPATH,"//span[contains(text(),'Fund Movement Report')]"),
             "fund_movement_report":(By.XPATH,"///h3[normalize-space()='Fund Movement Report']"),
-            "from_date_picker":(By.XPATH,"//button[@aria-controls='relStartDate']"),
+            #"from_date_picker":(By.XPATH,"//button[@aria-controls='relStartDate']"),
+            "from_date_picker":(By.XPATH,"//button[@aria-controls='relStartDate']//span[@class='sl-icon sl-icon-calendar sl-icon_non-interactive']"),
             "date_picker_day_to_month_to_year":(By.XPATH,"//span[@class='sl-icon sl-icon-caret-down sl-icon_non-interactive']"),
             "to_date_picker":(By.XPATH,"//button[@aria-controls='relEndDate']//span[@class='sl-icon sl-icon-calendar sl-icon_non-interactive']"),
             "disabled_export_btn":(By.XPATH,"//span[@class='sl-icon sl-icon-download sl-icon_non-interactive']/parent::*/parent::button[text()='Export']"),
             "reset_btn":(By.XPATH, "//button[normalize-space()='Reset']"),
             "today_btn":(By.XPATH,"//td[@class='current-month-cell current-day']"),
-            "export_btn":(By.XPATH,"//button[text()='Export']"),
+            "export_btn":(By.XPATH,"//button[normalize-space()='Export']"),
             "three_months_error_one":(By.XPATH,"//div[@class='notification-component']"),
             # "three_months_error_two":(By.XPATH,"//p[text()='Only 3 months is allowed'][2]"),
-            "successful_pop_up":(By.XPATH,"//h2[text()='Fund Movement File generation is Completed. File is  exported to Downloads folder.']")
+            #"successful_pop_up":(By.XPATH,"//h2[text()='Fund Movement File generation is Completed. File is exported to Downloads folder.']")
+            "successful_pop_up":(By.XPATH,"//div[@role='dialog']")
             }
     
     
