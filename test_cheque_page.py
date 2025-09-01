@@ -57,7 +57,7 @@ def test_cheque_page(browser,request):
     assert cheque_page.verify_reissuance().is_displayed()
     assert cheque_page.verify_target_currency().is_displayed()
     assert cheque_page.verify_action().is_displayed()
-    screenshot_path = os.path.join(os.getcwd()+"\screenshots", "TC0006.png")
+    screenshot_path = os.path.join(os.getcwd()+"screenshots", "TC0006.png")
     request.node.driver.save_screenshot(screenshot_path)
     request.node.add_report_section(
         'test',
@@ -94,7 +94,7 @@ def test_fetch_db_validate_cheque(browser,request):
     record = cursor.fetchall()
     assert cheque_page.verify_payment_out_ref() in record[check_record]
     print("data match for Cheque Page")
-    screenshot_path = os.path.join(os.getcwd()+"\screenshots", "TC0007.png")
+    screenshot_path = os.path.join(os.getcwd()+"screenshots", "TC0007.png")
     request.node.driver.save_screenshot(screenshot_path)
     request.node.add_report_section(
         'test',
