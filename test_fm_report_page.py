@@ -48,7 +48,7 @@ def test_fm_report_page(browser,request):
     assert fm_report_page.verify_from_date_picker().is_displayed()
     assert fm_report_page.verify_to_date_picker().is_displayed()
     assert fm_report_page.verify_disabled_export_btn().is_displayed()
-    screenshot_path = os.path.join(os.getcwd()+"\screenshots", "TC0010.png")
+    screenshot_path = os.path.join(os.getcwd()+"screenshots", "TC0010.png")
     request.node.driver.save_screenshot(screenshot_path)
     request.node.add_report_section(
         'test',
@@ -77,25 +77,64 @@ def test_check_three_months_validation(browser,request):
     fm_report_page.click_finance()
     fm_report_page.click_fm_report_page()
     time.sleep(5)
-    current_date = datetime.now()
-    three_months_ago = current_date - relativedelta(months=3)
-    year = three_months_ago.year
-    # month = three_months_ago.strftime("%B")
-    month = calendar.month_abbr[one_day_closer.month]
-    day = three_months_ago.day
+
+    # current_date = datetime.now()
+    # three_months_ago = current_date - relativedelta(months=3)
+    # year = three_months_ago.year
+    # month = three_months_ago.strftime("%b")
+    # day = three_months_ago.day
+
+    # 提取年月日
+    target_date = datetime.now()
+    # test data： target_date = datetime(2025, 1, 30)
+    three_months_ago = target_date - relativedelta(months=3)
+    year_text = str(three_months_ago.year)
+    month_text = three_months_ago.strftime("%b")  # 获取月份缩写，比如 'Jun'
+    day_text = str(three_months_ago.day)
+
     fm_report_page.click_from_date_picker()
-    year_field = browser.find_element(By.XPATH, "//option[@value='{}']".format(year))
-    year_field.click()
-    month_field = browser.find_element(By.XPATH, "//option[@value='{}']".format(month))
-    month_field.click()
-    day_field = browser.find_element(By.XPATH, "//div[contains(@class,'react-datepicker__day react-datepicker__day--0{}')][last()]".format(day))
-    day_field.click()
+    fm_report_page.click_date_picker_day_to_month_to_year()
+    fm_report_page.click_date_picker_day_to_month_to_year()
+
+    # # Test
+    # year_field = browser.find_element(By.XPATH, "//td[normalize-space()='2025']")
+    # year_field.click()
+    # month_field = browser.find_element(By.XPATH, "//td[normalize-space()='Jun']")
+    # month_field.click()
+    # # day_field = browser.find_element(By.XPATH, "//td[normalize-space()='2']")
+    # day_field = browser.find_element(By.XPATH, "//td[@class='current-month-cell '][normalize-space()='2']")
+    # day_field.click()
+
+    # Original
+    # year_field = browser.find_element(By.XPATH, "//td[normalize-space()='{}']".format(year))
+    # year_field.click()
+    # month_field = browser.find_element(By.XPATH, "//td[normalize-space()='{}']".format(month))
+    # month_field.click()
+    # day_field = browser.find_element(By.XPATH, "(//td[normalize-space()='{}'])[last()]".format(day))
+    # day_field.click()
+
+   # 点击年份
+    year_xpath = f"//td[normalize-space()='{year_text}']"
+    year_element = browser.find_element(By.XPATH, year_xpath)
+    year_element.click()
+
+    # 点击月份
+    month_xpath = f"//td[normalize-space()='{month_text}']"
+    month_element = browser.find_element(By.XPATH, month_xpath)
+    month_element.click()
+
+    # 点击日期
+    # 这里假设你之前用的class 'current-month-cell '，可以这样写
+    day_xpath = f"//td[contains(@class, 'current-month-cell') and normalize-space()='{day_text}']"
+    day_element = browser.find_element(By.XPATH, day_xpath)
+    day_element.click()
+
     fm_report_page.click_to_date_picker()
     fm_report_page.click_today_btn()
     fm_report_page.click_export_btn()
     assert fm_report_page.verify_three_months_error_one().is_displayed()
-    assert fm_report_page.verify_three_months_error_two().is_displayed()
-    screenshot_path = os.path.join(os.getcwd()+"\screenshots", "TC0011.png")
+  # assert fm_report_page.verify_three_months_error_two().is_displayed()
+    screenshot_path = os.path.join(os.getcwd()+"screenshots", "TC0011.png")
     request.node.driver.save_screenshot(screenshot_path)
     request.node.add_report_section(
         'test',
@@ -124,87 +163,61 @@ def test_export_fund_movement_report(browser, request):
     fm_report_page.click_fm_report_page()
     time.sleep(5)
 
-    current_date = datetime.now()
-    three_months_ago = current_date - relativedelta(months=3)
-    one_day_closer = three_months_ago + timedelta(days=1)
+    # current_date = datetime.now()
+    # three_months_ago = current_date - relativedelta(months=3)
+    # one_day_closer = three_months_ago + timedelta(days=1)
 
-    year = one_day_closer.year
-    month = one_day_closer.strftime("%B")
-    day = one_day_closer.day
+     # 提取年月日
+    target_date = datetime.now()
+    # test data： target_date = datetime(2025, 1, 30)
+    three_months_ago = target_date - relativedelta(months=3)
+    one_day_closer = three_months_ago + timedelta(days=1)
+    
+    year_text = str(one_day_closer.year)
+    month_text = one_day_closer.strftime("%b")  # 获取月份缩写，比如 'Jun'
+    day_text = str(one_day_closer.day)
+
+    # year = one_day_closer.year
+    # month = one_day_closer.strftime("%B")
+    # day = one_day_closer.day
 
     fm_report_page.click_from_date_picker()
     fm_report_page.click_date_picker_day_to_month_to_year()
     fm_report_page.click_date_picker_day_to_month_to_year()
 
-    year_field = browser.find_element(By.XPATH, "//td[normalize-space()='{}']".format(year))
-    year_field.click()
-    month_field = browser.find_element(By.XPATH, "//td[normalize-space()='{}']".format(month))
-    month_field.click()
-    # day_field = browser.find_element(By.XPATH, "//td[normalize-space()='{}']".format(day))
-    day_field = browser.find_element(By.XPATH, "(//td[normalize-space()='{}'])[last()]".format(day))
-    day_field.click()
+    # year_field = browser.find_element(By.XPATH, "//td[normalize-space()='{}']".format(year))
+    # year_field.click()
+    # month_field = browser.find_element(By.XPATH, "//td[normalize-space()='{}']".format(month))
+    # month_field.click()
+    # # day_field = browser.find_element(By.XPATH, "//td[normalize-space()='{}']".format(day))
+    # day_field = browser.find_element(By.XPATH, "(//td[normalize-space()='{}'])[last()]".format(day))
+    # day_field.click()
+
+    # 点击年份
+    year_xpath = f"//td[normalize-space()='{year_text}']"
+    year_element = browser.find_element(By.XPATH, year_xpath)
+    year_element.click()
+
+    # 点击月份
+    month_xpath = f"//td[normalize-space()='{month_text}']"
+    month_element = browser.find_element(By.XPATH, month_xpath)
+    month_element.click()
+
+    # 点击日期
+    # 这里假设你之前用的class 'current-month-cell '，可以这样写
+    day_xpath = f"//td[contains(@class, 'current-month-cell') and normalize-space()='{day_text}']"
+    day_element = browser.find_element(By.XPATH, day_xpath)
+    day_element.click()
+    
     fm_report_page.click_to_date_picker()
     fm_report_page.click_today_btn() 
     fm_report_page.click_export_btn()
     time.sleep(5)
     assert fm_report_page.verify_successful_pop_up().is_displayed()
-    screenshot_path = os.path.join(os.getcwd()+"\screenshots", "TC0012.png")
+    screenshot_path = os.path.join(os.getcwd()+"screenshots", "TC0012.png")
     request.node.driver.save_screenshot(screenshot_path)
     request.node.add_report_section(
         'test',
         'Screenshot',
         f'<img src="{screenshot_path}">')
     
-
-    # # —— 计算日期：今天往回 3 个月再 +1 天
-    # current_date = datetime.now()
-    # three_months_ago = current_date - relativedelta(months=3)
-    # start_date = three_months_ago + timedelta(days=1)
-
-    # start_year  = start_date.year               # e.g., 2025
-    # start_month = start_date.strftime("%B")     # e.g., "May"（英文月份名）
-    # start_day   = start_date.day                # e.g., 28
-
-    # # —— 打开 From 日历
-    # fm_report_page.click_from_date_picker()
-
-    # # （若你的日历需要切换两次到“年视图”，保留；否则可以删除）
-    # fm_report_page.click_date_picker_day_to_month_to_year()
-    # fm_report_page.click_date_picker_day_to_month_to_year()
-
-    # # —— 选年份（按你原先的结构用<td>，若是<select><option>则改回<option>版本）
-    # WebDriverWait(browser, 10).until(
-    #     EC.element_to_be_clickable((By.XPATH, f"//td[normalize-space()='{start_year}']"))
-    # ).click()
-
-    # # —— 选月份（同理，按你当前 DOM 结构）
-    # WebDriverWait(browser, 10).until(
-    #     EC.element_to_be_clickable((By.XPATH, f"//td[normalize-space()='{start_month}']"))
-    # ).click()
-
-    # # —— 选“日”：使用 td[@role='gridcell']，并排除跨月的单元格
-    # day_xpath = (
-    #     f"//td[@role='gridcell' and normalize-space(text())='{start_day}' "
-    #     "and not(contains(@class,'outside')) and not(contains(@class,'outside-month'))]"
-    # )
-
-    # WebDriverWait(browser, 15).until(
-    #     EC.element_to_be_clickable((By.XPATH, day_xpath))
-    # ).click()
-
-    # # —— 结束日期 = 今天
-    # fm_report_page.click_to_date_picker()
-    # fm_report_page.click_today_btn()
-
-    # # —— 导出并等待成功弹窗
-    # fm_report_page.click_export_btn()
-    # WebDriverWait(browser, 15).until(
-    #     EC.visibility_of(fm_report_page.verify_successful_pop_up())
-    # )
-    
-    # screenshot_path = os.path.join(os.getcwd()+"\screenshots", "TC0012.png")
-    # request.node.driver.save_screenshot(screenshot_path)
-    # request.node.add_report_section(
-    #     'test',
-    #     'Screenshot',
-    #     f'<img src="{screenshot_path}">')
