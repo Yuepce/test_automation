@@ -5,17 +5,17 @@ import time
 import unittest
 import utils.excel_utils as ExcelUtils
 import os
-
+ 
 #pytest.fixture
 def browser():
     driver = webdriver.Chrome()
     yield driver.quit()
-
+ 
 @pytest.mark.TC0001
 @pytest.mark.login
 def test_login(browser, request):
     data = ExcelUtils.get_data('TC0001')
-    
+   
     if data:
         # Accessing the 'Description' value
         description = data.get('Test Case Description')
@@ -29,18 +29,20 @@ def test_login(browser, request):
     # assert False
     home_page.click_login_btn()
     time.sleep(10)
-    
+   
     impf_title = home_page.test_impf()
     home_page.click_finance()
     # ps_tab = home_page.verify_payment_services_tab()
     # fs_tab = home_page.verify_fund_services_tab()
-    finance_tab = home_page.verify_finances_tab()
     ic_tab = home_page.verify_intermediary_change_tab()
+    ep_tab = home_page.verify_enquiry_platform_tab()
+    rebate_tab = home_page.verify_rebate_tab()
     # ealert_flag = home_page.verify_ealert_sunsurf_flag()
     print("[CP: Get iMPF Page Title: ]"+ impf_title)
     assert impf_title == "iMPF"
-    assert finance_tab == "Finance"
     assert ic_tab == "Intermediary"
+    assert ep_tab == "Enquiry Platform"
+    assert rebate_tab == "Rebate"
     # assert ps_tab == "Payment Services"
     # assert fs_tab == "Fund Services"
     # assert ealert_flag == "E-alert and SunSurf Consent Flag"
@@ -50,10 +52,10 @@ def test_login(browser, request):
         'test',
         'Screenshot',
         f'<img src="{screenshot_path}">')
-    
-
+   
+ 
 @pytest.mark.TC0013
-@pytest.mark.logout   
+@pytest.mark.logout  
 def test_logout(browser, request):
     data = ExcelUtils.get_data('TC0013')
     if data:
@@ -79,5 +81,3 @@ def test_logout(browser, request):
         'Screenshot',
         f'<img src="{screenshot_path}">')
     assert home_page.verify_login_page().is_displayed()
-    
-    
