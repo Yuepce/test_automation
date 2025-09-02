@@ -72,7 +72,7 @@ class FMReportPage(BasePage):
 
     def verify_three_months_error_one(self):
         three_months_error_one = self.find_element(*self.locators["three_months_error_one"])
-        return three_months_error_one.text
+        return three_months_error_one
     
     # def verify_three_months_error_two(self):
     #     three_months_error_two = self.find_element(*self.locators["three_months_error_two"])
