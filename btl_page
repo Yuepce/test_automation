@@ -1,39 +1,42 @@
 from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
 from selenium import webdriver
-class BtlPage(BasePage):
+import re
+
+class BtoPage(BasePage):
     def __init__(self,driver):
         super().__init__(driver)
         self.locators = {
-            "btl_page": (By.XPATH, "//span[contains(text(),'Bank Transfer Local')]"),
-            "payment_services_tab":(By.XPATH,"//a[text()='Payment Services']"),
+            "bto_page": (By.XPATH, "//span[contains(text(),'Bank Transfer Overseas')]"),
+            # "payment_services_tab":(By.XPATH,"//a[text()='Payment Services']"),
             "finance_tab": (By.XPATH, "//button[@id='sl-mega-menu-toggle-Finance']//span[contains(text(),'Finance')]"),
             "filter_btn":(By.XPATH,"//button[text()='Filter']"),
             "clear_filter_btn":(By.XPATH,"//button[text()='Clear Filter']"),
-            "update_local_bank_transfer_details":(By.XPATH,"//*[text()='Update Local Bank Transfer Details']"),
+            # "update_overseas_bank_transfer_details":(By.XPATH,"/html[1]/body[1]/div[1]/div[1]/main[1]/div[1]/div[1]/div[2]/div[1]/div[2]/table[1]/tbody[1]/tr[1]/td[15]/div[1]/span[1]/button[1]/span[1]"),
             "import_date":(By.XPATH,"//*[text()='Import Date']"),
-            "account_type":(By.XPATH,"//*[text()='Account Type']"), # April added
+            "account_type":(By.XPATH,"//*[text()='Account Type']"),
             "id_er_member":(By.XPATH,"//*[text()='MPF ID of ER / Member']"),
             "mpf_account_no":(By.XPATH,"//*[text()='MPF Account No']"),
             "payment_method":(By.XPATH,"//*[text()='Payment Method']"),
-           # "app_ref_no":(By.XPATH,"//*[text()='Application Ref No']"), # April changed 
-            "end_to_end_id":(By.XPATH,"//*[text()='End to End ID']"),
+            # "app_ref_no":(By.XPATH,"//*[text()='Application Ref No']"),
             "payment_out_ref_no":(By.XPATH,"//*[text()='Payment Out Ref No']"),
             "expected_payment_issue_date":(By.XPATH,"//*[text()='Expected Payment Issue Date']"),
-            "dealing_date":(By.XPATH,"//*[text()='Dealing Date']"), # April added
-            "bank_cd":(By.XPATH,"//*[text()='Bank Code']"),
-            "bank_acc_no":(By.XPATH,"//*[text()='Bank Account No']"),
+            "dealing_date":(By.XPATH,"//*[text()='Dealing Date']"),
+            "swift_cd":(By.XPATH,"//*[text()='Swift Code']"),
             "payee":(By.XPATH,"//*[text()='Payee']"),
             "payment":(By.XPATH,"//*[text()='Payment in HKD']"),
             "status":(By.XPATH,"//*[text()='Status']"),
             "reissuance":(By.XPATH,"//*[text()='Reissuance Indicator']"),
             "target_currency":(By.XPATH,"//*[text()='Target Currency']"),
             "action":(By.XPATH,"//*[text()='Actions']"),
-            "payment_out_ref":(By.XPATH,"//tbody/tr[1]/td[7]") # April changed it 
+            "payment_out_ref":(By.XPATH,"tbody tr:nth-child(1) td:nth-child(6) div:nth-child(1)"),
+            "rows_per_page": (By.XPATH, "//div[@id='rows-per-page']//span[@class='sl-icon sl-icon-chevron-down sl-icon_non-interactive']"),
+            "hundred_rows_per_page": (By.XPATH, "//div[@id='rows-per-page-3']"),
+            "showing_results": (By.XPATH, "//span[@role='status']")
             }
-
-    def click_btl_page(self):
-        self.find_element(*self.locators['btl_page']).click()
+    
+    def click_bto_page(self):
+        self.find_element(*self.locators['bto_page']).click()
 
     def click_finance(self):
         self.find_element(*self.locators['finance_tab']).click()
@@ -41,31 +44,30 @@ class BtlPage(BasePage):
     # def click_payment_services(self):
     #     self.find_element(*self.locators['payment_services_tab']).click()
 
-    def verify_payment_out_ref(self):
-        payment_out_ref = self.find_element(*self.locators["payment_out_ref"])
-        return payment_out_ref.text
-
     def verify_filter_btn(self):
         filter_btn = self.find_element(*self.locators["filter_btn"])
         return filter_btn
+    
+    def verify_payment_out_ref(self):
+        payment_out_ref = self.find_element(*self.locators["payment_out_ref"])
+        return payment_out_ref.text
     
     def verify_clear_filter_btn(self):
         clear_filter_btn = self.find_element(*self.locators["clear_filter_btn"])
         return clear_filter_btn
     
-    def verify_update_local_bank_transfer_details(self):
-        update_local_bank_transfer_details = self.find_element(*self.locators["update_local_bank_transfer_details"])
-        return update_local_bank_transfer_details
+    # def verify_update_overseas_bank_transfer_details(self):
+    #     update_overseas_bank_transfer_details = self.find_element(*self.locators["update_overseas_bank_transfer_details"])
+    #     return update_overseas_bank_transfer_details
     
     def verify_import_date(self):
         import_date = self.find_element(*self.locators["import_date"])
         return import_date
     
-    # April added
     def verify_account_type(self):
         account_type = self.find_element(*self.locators["account_type"])
         return account_type
-    
+
     def verify_id_er_member(self):
         id_er_member = self.find_element(*self.locators["id_er_member"])
         return id_er_member
@@ -82,10 +84,6 @@ class BtlPage(BasePage):
     #     app_ref_no = self.find_element(*self.locators["app_ref_no"])
     #     return app_ref_no
     
-    def verify_end_to_end_id(self):
-        end_to_end_id = self.find_element(*self.locators["end_to_end_id"])
-        return end_to_end_id
-    
     def verify_payment_out_ref_no(self):
         payment_out_ref_no = self.find_element(*self.locators["payment_out_ref_no"])
         return payment_out_ref_no
@@ -94,18 +92,13 @@ class BtlPage(BasePage):
         expected_payment_issue_date = self.find_element(*self.locators["expected_payment_issue_date"])
         return expected_payment_issue_date
     
-    # April added
     def verify_dealing_date(self):
         dealing_date = self.find_element(*self.locators["dealing_date"])
         return dealing_date
     
-    def verify_bank_cd(self):
-        bank_cd = self.find_element(*self.locators["bank_cd"])
-        return bank_cd
-    
-    def verify_bank_acc_no(self):
-        bank_acc_no = self.find_element(*self.locators["bank_acc_no"])
-        return bank_acc_no
+    def verify_swift_cd(self):
+        swift_cd = self.find_element(*self.locators["swift_cd"])
+        return swift_cd
     
     def verify_payee(self):
         payee = self.find_element(*self.locators["payee"])
@@ -128,5 +121,26 @@ class BtlPage(BasePage):
         return target_currency
     
     def verify_action(self):
-        action = self.find_element(*self.locators["actions"])
+        action = self.find_element(*self.locators["action"])
         return action
+    
+    sorting_column_list = [verify_import_date, verify_account_type, verify_id_er_member,verify_mpf_account_no,
+                           verify_payment_method, verify_payment_out_ref_no, verify_expected_payment_issue_date,
+                           verify_dealing_date, verify_swift_cd, verify_payee, verify_payment, verify_target_currency,
+                           verify_status, verify_reissuance]
+    
+    def click_rows_per_page(self):
+        element = self.find_element(*self.locators["rows_per_page"])
+        self.driver.execute_script("arguments[0].scrollIntoView();", element)
+        self.driver.execute_script("arguments[0].click();", element)
+
+    def hundred_rows_per_page(self):
+        element = self.find_element(*self.locators["hundred_rows_per_page"])
+        self.driver.execute_script("arguments[0].scrollIntoView();", element)
+        self.driver.execute_script("arguments[0].click();", element)
+
+    def showing_results(self):
+        showing_results = self.find_element(*self.locators["showing_results"])
+        # self.driver.execute_script("arguments[0].scrollIntoView();", showing_results)
+        return re.search(r'Showing results 1-(\d+) of \d+', showing_results.text).group(1)
+    
