@@ -6,6 +6,7 @@ import time
 import tests.test_home_page as test_home_page
 import psycopg2
 import utils.excel_utils as ExcelUtils
+from selenium.webdriver.common.by import By
 import os
 #pytest.fixture
 def browser():
@@ -37,21 +38,19 @@ def test_bto_page(browser,request):
     assert bto_page.verify_filter_btn().is_displayed()
     assert bto_page.verify_clear_filter_btn().is_displayed()
     # assert bto_page.verify_update_overseas_bank_transfer_details().is_displayed()
-    assert bto_page.verify_import_date().is_displayed()
-    assert bto_page.verify_account_type().is_displayed()
-    assert bto_page.verify_id_er_member().is_displayed()
-    assert bto_page.verify_mpf_account_no().is_displayed()
-    assert bto_page.verify_payment_method().is_displayed()
-    # assert bto_page.verify_app_ref_no().is_displayed()
-    assert bto_page.verify_payment_out_ref_no().is_displayed()
-    assert bto_page.verify_expected_payment_issue_date().is_displayed()
-    assert bto_page.verify_swift_cd().is_displayed()
-    assert bto_page.verify_payee().is_displayed()
-    assert bto_page.verify_payment().is_displayed()
-    assert bto_page.verify_status().is_displayed()
-    assert bto_page.verify_dealing_date().is_displayed()
-    assert bto_page.verify_reissuance().is_displayed()
-    assert bto_page.verify_target_currency().is_displayed()
+    bto_page.click_rows_per_page()
+    time.sleep(2)
+    bto_page.hundred_rows_per_page()
+    time.sleep(5)
+    showing_results = bto_page.showing_results()
+    for column_index, column_function in enumerate(bto_page.sorting_column_list, start = 1):
+        assert column_function(bto_page).is_displayed()
+        print(column_function(bto_page).text, end = " ")
+        column_function(bto_page).click()
+        sorted_first_value = bto_page.find_element(By.XPATH, "//tbody/tr[1]/td[{}]".format(column_index)).text
+        sorted_largest_value_on_page = bto_page.find_element(By.XPATH, "//tbody/tr[{}]/td[{}]".format(int(showing_results),column_index)).text
+        assert sorted_first_value <= sorted_largest_value_on_page, f"{column_function(bto_page).text} Sorting Failed"
+        print(f"Sorted first value {"None" if sorted_first_value == "" else sorted_first_value} <= Sorted max value on page ({showing_results}th row) {"None" if sorted_largest_value_on_page == "" else sorted_largest_value_on_page}")
     assert bto_page.verify_action().is_displayed()
     screenshot_path = os.path.join(os.getcwd()+"\screenshots", "TC0002.png")
     request.node.driver.save_screenshot(screenshot_path)
@@ -59,7 +58,7 @@ def test_bto_page(browser,request):
         'test',
         'Screenshot',
         f'<img src="{screenshot_path}">')
-
+    
 @pytest.mark.TC0003
 @pytest.mark.fetchDBValidateBTO
 def test_fetch_db_validate_bto(browser,request):
