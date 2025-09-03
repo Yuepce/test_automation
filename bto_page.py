@@ -1,6 +1,8 @@
 from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
 from selenium import webdriver
+import re
+
 class BtoPage(BasePage):
     def __init__(self,driver):
         super().__init__(driver)
@@ -27,7 +29,10 @@ class BtoPage(BasePage):
             "reissuance":(By.XPATH,"//*[text()='Reissuance Indicator']"),
             "target_currency":(By.XPATH,"//*[text()='Target Currency']"),
             "action":(By.XPATH,"//*[text()='Actions']"),
-            "payment_out_ref":(By.CSS_SELECTOR,"tbody tr:nth-child(1) td:nth-child(6) div:nth-child(1)")
+            "payment_out_ref":(By.XPATH,"tbody tr:nth-child(1) td:nth-child(6) div:nth-child(1)"),
+            "rows_per_page": (By.XPATH, "//div[@id='rows-per-page']//span[@class='sl-icon sl-icon-chevron-down sl-icon_non-interactive']"),
+            "hundred_rows_per_page": (By.XPATH, "//div[@id='rows-per-page-3']"),
+            "showing_results": (By.XPATH, "//span[@role='status']")
             }
     
     def click_bto_page(self):
@@ -118,4 +123,24 @@ class BtoPage(BasePage):
     def verify_action(self):
         action = self.find_element(*self.locators["action"])
         return action
+    
+    sorting_column_list = [verify_import_date, verify_account_type, verify_id_er_member,verify_mpf_account_no,
+                           verify_payment_method, verify_payment_out_ref_no, verify_expected_payment_issue_date,
+                           verify_dealing_date, verify_swift_cd, verify_payee, verify_payment, verify_target_currency,
+                           verify_status, verify_reissuance]
+    
+    def click_rows_per_page(self):
+        element = self.find_element(*self.locators["rows_per_page"])
+        self.driver.execute_script("arguments[0].scrollIntoView();", element)
+        self.driver.execute_script("arguments[0].click();", element)
+
+    def hundred_rows_per_page(self):
+        element = self.find_element(*self.locators["hundred_rows_per_page"])
+        self.driver.execute_script("arguments[0].scrollIntoView();", element)
+        self.driver.execute_script("arguments[0].click();", element)
+
+    def showing_results(self):
+        showing_results = self.find_element(*self.locators["showing_results"])
+        # self.driver.execute_script("arguments[0].scrollIntoView();", showing_results)
+        return re.search(r'Showing results 1-(\d+) of \d+', showing_results.text).group(1)
     
