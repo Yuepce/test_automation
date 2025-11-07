@@ -1,83 +1,82 @@
 import os
-from spire.pdf import PdfDocument, PdfComparer, PdfBrushes, PdfTrueTypeFont, PdfSolidBrush, PdfStringFormat, PdfTextAlignment
-from spire.pdf.graphics import PdfRGBColor, PdfPen, PdfPageBase, PdfFontStyle
-from spire.pdf.common import SizeF, PointF, RectangleF
+from spire.pdf import PdfDocument, PdfComparer, PdfBrushes, PdfTrueTypeFont, PdfSolidBrush, PdfStringFormat
+from spire.pdf.graphics import PdfRGBColor, PdfPen, PdfFontStyle
+from spire.pdf.common import RectangleF, PointF
 
-# Input files
+# === Input paths ===
 pdf_a_path = '20250918115113_Z0N613_E60043126_FNA.pdf'
 pdf_b_path = '20250918115113_Z0N613_E60043126_FNA - Copy.pdf'
 
-# Output folder setup
+# === Output setup ===
 output_dir = "output"
 os.makedirs(output_dir, exist_ok=True)
-output_path = os.path.join(output_dir, "CompareResult.pdf")
+compare_path = os.path.join(output_dir, "CompareResult.pdf")
+final_path = os.path.join(output_dir, "CompareResult_withReportBox.pdf")
 
-# Load both PDFs
+# === Step 1: Compare two PDFs ===
 pdf_a = PdfDocument(pdf_a_path)
 pdf_b = PdfDocument(pdf_b_path)
 
-# Compare PDFs
 comparer = PdfComparer(pdf_a, pdf_b)
-comparer.Compare(output_path)
+comparer.Compare(compare_path)
 
-# Dispose the input documents
 pdf_a.Dispose()
 pdf_b.Dispose()
 
-# Now open the generated comparison result to add report boxes
+# === Step 2: Add difference summary boxes ===
 result_doc = PdfDocument()
-result_doc.LoadFromFile(output_path)
+result_doc.LoadFromFile(compare_path)
 
-# Font & style setup
+# --- Styles ---
 font = PdfTrueTypeFont("Arial", 9, PdfFontStyle.Regular)
+title_font = PdfTrueTypeFont("Arial", 10, PdfFontStyle.Bold)
 brush = PdfSolidBrush(PdfRGBColor(0, 0, 0))
-box_pen = PdfPen(PdfRGBColor(30, 144, 255))
 header_brush = PdfSolidBrush(PdfRGBColor(220, 235, 255))
+pen = PdfPen(PdfRGBColor(30, 144, 255))
 string_format = PdfStringFormat()
-string_format.Alignment = PdfTextAlignment.Left
 
-# Utility: Extract highlighted differences from each page
+# --- Extract highlighted annotation text ---
 def extract_highlighted_text(page):
     highlights = []
-    for annot in page.AnnotationsWidget:
-        if annot.AnnotationType == "Highlight":
-            try:
-                txt = annot.Text
-                if txt:
-                    highlights.append(txt.strip())
-            except:
-                continue
+    if page.AnnotationsWidget is not None:
+        for annot in page.AnnotationsWidget:
+            # AnnotationTypeName is safer in Spire-Python than AnnotationType
+            if hasattr(annot, "AnnotationTypeName") and "Highlight" in annot.AnnotationTypeName:
+                try:
+                    txt = getattr(annot, "Text", None)
+                    if txt:
+                        highlights.append(txt.strip())
+                except Exception:
+                    continue
     return highlights
 
-# Loop through each page in CompareResult
+# --- Loop through each page ---
 for i in range(result_doc.Pages.Count):
     page = result_doc.Pages.get_Item(i)
     width = page.Canvas.ClientSize.Width
 
-    # Extract highlighted differences for this page
+    # Get difference text
     diff_texts = extract_highlighted_text(page)
     if diff_texts:
         content = "\n".join(f"- {t}" for t in diff_texts)
     else:
         content = "No differences detected on this page."
 
-    # Define report box size
+    # Draw the light-blue box
     box_height = 80
-    box_rect = RectangleF(10, 10, width - 20, box_height)
+    rect = RectangleF(10, 10, width - 20, box_height)
+    page.Canvas.DrawRectangle(header_brush, rect)
+    page.Canvas.DrawRectangle(pen, rect)
 
-    # Draw background box and border
-    page.Canvas.DrawRectangle(header_brush, box_rect)
-    page.Canvas.DrawRectangle(box_pen, box_rect)
-
-    # Title text
+    # Title
     page.Canvas.DrawString(
         f"Page {i+1} – Difference Summary:",
-        PdfTrueTypeFont("Arial", 10, PdfFontStyle.Bold),
+        title_font,
         brush,
         PointF(15, 15)
     )
 
-    # Difference content text
+    # Content
     page.Canvas.DrawString(
         content,
         font,
@@ -86,9 +85,8 @@ for i in range(result_doc.Pages.Count):
         string_format
     )
 
-# Save enhanced output
-final_path = os.path.join(output_dir, "CompareResult_withReportBox.pdf")
+# === Save result ===
 result_doc.SaveToFile(final_path)
 result_doc.Dispose()
 
-print(f"✅ Enhanced comparison report generated: {final_path}")
+print(f"✅ Enhanced comparison report generated successfully: {final_path}")
